@@ -1,6 +1,6 @@
 app:
   title: Scaffolded Backstage App
-  baseUrl: http://localhost:3000
+  baseUrl: http://52.14.107.77:7007
 
   # Enable all packages by default, this will discover packages from packages/app/package.json
   packages: all
@@ -12,7 +12,7 @@ app:
           path: /
 
 organization:
-  name: My Company
+  name: eversana
 
 backend:
   # Used for enabling authentication, secret is shared by all backend plugins
@@ -21,17 +21,22 @@ backend:
   # auth:
   #   keys:
   #     - secret: ${BACKEND_SECRET}
-  baseUrl: http://localhost:7007
+  baseUrl: http://52.14.107.77:7007
   listen:
+    host: 0.0.0.0
     port: 7007
     # Uncomment the following host directive to bind to specific interfaces
     # host: 127.0.0.1
   csp:
     connect-src: ["'self'", 'http:', 'https:']
+
+    upgrade-insecure-requests: false
+
+    strict-transport-security: false
     # Content-Security-Policy directives follow the Helmet format: https://helmetjs.github.io/#reference
     # Default Helmet Content-Security-Policy values can be removed by setting the key to false
   cors:
-    origin: http://localhost:3000
+    origin: http://52.14.107.77:7007
     methods: [GET, HEAD, PATCH, POST, PUT, DELETE]
     credentials: true
   # This is for local development only, it is not recommended to use this in production
@@ -78,10 +83,14 @@ techdocs:
     type: 'local' # Alternatives - 'googleGcs' or 'awsS3'. Read documentation for using alternatives.
 
 auth:
-  # see https://backstage.io/docs/auth/ to learn about auth providers
+  environment: development
   providers:
+    guest:
+      dangerouslyAllowOutsideDevelopment: true
+  # see https://backstage.io/docs/auth/ to learn about auth providers
+  #providers:
     # See https://backstage.io/docs/auth/guest/provider
-    guest: {}
+    #guest: {}
   # see https://backstage.io/docs/ai/mcp-actions#client-id-metadata-documents
   # to learn more about client id metadata documents
   clientIdMetadataDocuments:
