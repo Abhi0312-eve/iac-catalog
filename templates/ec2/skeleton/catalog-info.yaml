@@ -1,0 +1,10 @@
+apiVersion: backstage.io/v1alpha1
+kind: Component
+
+metadata:
+  name: ${{ values.vmName }}
+  description: AWS EC2 Infrastructure
+spec:
+  type: infrastructure
+  lifecycle: experimental
+  owner: ${{ values.owner }}

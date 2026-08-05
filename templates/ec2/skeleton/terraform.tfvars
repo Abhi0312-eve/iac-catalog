@@ -1,0 +1,6 @@
+aws_region    = "${{ values.awsRegion }}"
+instance_name = "${{ values.vmName }}"
+instance_type = "${{ values.instanceType }}"
+ami_id         = "${{ values.amiId }}"
+environment    = "${{ values.environment }}"
+owner          = "${{ values.owner }}"

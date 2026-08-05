@@ -115,20 +115,20 @@ catalog:
     - allow: [Component, System, API, Resource, Location]
   locations:
     # Local example data, file locations are relative to the backend process, typically `packages/backend`
-    - type: file
-      target: ../../examples/entities.yaml
+    #- type: file
+    #  target: ../../examples/entities.yaml
 
     # Local example template
     - type: file
-      target: ../../examples/template/template.yaml
+      target: /app/templates/ec2/template.yaml
       rules:
         - allow: [Template]
 
     # Local example organizational data
-    - type: file
-      target: ../../examples/org.yaml
-      rules:
-        - allow: [User, Group]
+    #- type: file
+    #  target: ../../examples/org.yaml
+    #  rules:
+    #    - allow: [User, Group]
 
     ## Uncomment these lines to add more example data
     # - type: url

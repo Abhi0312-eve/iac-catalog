@@ -1,0 +1,95 @@
+apiVersion: scaffolder.backstage.io/v1beta3
+kind: Template
+
+metadata:
+  name: aws-ec2-template
+  title: AWS EC2 Template
+  description: Provision an AWS EC2 instance using Terraform
+  tags:
+    - aws
+    - ec2
+    - terraform
+
+spec:
+  owner: guest
+  type: infrastructure
+
+  parameters:
+    - title: EC2 Configuration
+      required:
+        - vmName
+        - awsRegion
+        - instanceType
+        - environment
+        - owner
+        - repoName
+
+      properties:
+        vmName:
+          title: EC2 Name
+          type: string
+
+        awsRegion:
+          title: AWS Region
+          type: string
+          default: us-east-1
+
+        environment:
+          title: Environment
+          type: string
+          enum:
+            - dev
+            - test
+            - prod
+
+        instanceType:
+          title: Instance Type
+          type: string
+          default: t3.micro
+
+        amiId:
+          title: AMI ID
+          type: string
+          default: ami-xxxxxxxx
+
+        owner:
+          title: Owner
+          type: string
+
+        repoName:
+          title: GitHub Repository Name
+          type: string
+
+  steps:
+
+    - id: fetch-base
+      name: Fetch Terraform Skeleton
+      action: fetch:template
+      input:
+        url: ./skeleton
+        values:
+          vmName: ${{ parameters.vmName }}
+          awsRegion: ${{ parameters.awsRegion }}
+          environment: ${{ parameters.environment }}
+          instanceType: ${{ parameters.instanceType }}
+          amiId: ${{ parameters.amiId }}
+          owner: ${{ parameters.owner }}
+
+    - id: publish
+      name: Publish to GitHub
+      action: publish:github
+      input:
+        repoUrl: github.com?repo=${{ parameters.repoName }}&owner=Abhi0312-eve
+        defaultBranch: main
+
+    - id: register
+      name: Register in Catalog
+      action: catalog:register
+      input:
+        repoContentsUrl: ${{ steps.publish.output.repoContentsUrl }}
+        catalogInfoPath: /catalog-info.yaml
+
+  output:
+    links:
+      - title: Repository
+        url: ${{ steps.publish.output.remoteUrl }}
