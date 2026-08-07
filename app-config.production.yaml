@@ -1,6 +1,6 @@
 app:
   # Should be the same as backend.baseUrl when using the `app-backend` plugin.
-  baseUrl: http://localhost:7007
+  baseUrl: https://18.220.149.34
 
 backend:
   # Note that the baseUrl should be the URL that the browser and other clients
@@ -8,10 +8,18 @@ backend:
   # reachable not just from within the backend host, but from all of your
   # callers. When its value is "http://localhost:7007", it's strictly private
   # and can't be reached by others.
-  baseUrl: http://localhost:7007
+  baseUrl: https://18.220.149.34
   # The listener can also be expressed as a single <host>:<port> string. In this case we bind to
   # all interfaces, the most permissive setting. The right value depends on your specific deployment.
   listen: ':7007'
+
+  cors:
+    origin: https://18.220.149.34
+    methods: [GET, HEAD, PATCH, POST, PUT, DELETE]
+    credentials: true
+  
+  csp:
+    "upgrade-insecure-requests": false
 
   # config options: https://node-postgres.com/apis/client
   database:
@@ -30,7 +38,8 @@ backend:
 
 auth:
   providers:
-    guest: {}
+    guest:
+      dangerouslyAllowOutsideDevelopment: true
 
 catalog:
   # Overrides the default list locations from app-config.yaml as these contain example data.
@@ -48,8 +57,20 @@ catalog:
       rules:
         - allow: [Template]
 
+
+    # AWS EC2 Template
+    - type: file
+      target: ./templates/aws-ec2/template.yaml
+      rules:
+        - allow: [Template]      
+
     # Local example organizational data
     - type: file
       target: ./examples/org.yaml
       rules:
         - allow: [User, Group]
+
+integrations:
+  github:
+    - host: github.com
+      token: ${GITHUB_TOKEN}

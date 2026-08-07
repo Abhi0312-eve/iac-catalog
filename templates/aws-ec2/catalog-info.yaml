@@ -1,0 +1,9 @@
+apiVersion: backstage.io/v1alpha1
+kind: Location
+
+metadata:
+  name: aws-ec2-template
+
+spec:
+  targets:
+    - ./template.yaml

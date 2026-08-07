@@ -81,7 +81,8 @@ auth:
   # see https://backstage.io/docs/auth/ to learn about auth providers
   providers:
     # See https://backstage.io/docs/auth/guest/provider
-    guest: {}
+    guest: 
+      dangerouslyAllowOutsideDevelopment: true
   # see https://backstage.io/docs/ai/mcp-actions#client-id-metadata-documents
   # to learn more about client id metadata documents
   clientIdMetadataDocuments:
@@ -108,6 +109,12 @@ catalog:
     # Local example data, file locations are relative to the backend process, typically `packages/backend`
     - type: file
       target: ../../examples/entities.yaml
+
+    # AWS EC2 Template
+    - type: file
+      target: ./templates/aws-ec2/template.yaml
+      rules:
+        - allow: [Template]    
 
     # Local example template
     - type: file
@@ -137,7 +144,7 @@ kubernetes:
 # see https://backstage.io/docs/permissions/getting-started for more on the permission framework
 permission:
   # setting this to `false` will disable permissions
-  enabled: true
+  enabled: false
 
 # see https://backstage.io/docs/ai/mcp-actions for more details
 mcpActions:
