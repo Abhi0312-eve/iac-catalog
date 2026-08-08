@@ -1,4 +1,4 @@
-ivariable "instanceName" {
+variable "instanceName" {
   description = "EC2 Instance Name"
   type        = string
 }
@@ -13,12 +13,10 @@ variable "instanceType" {
   type        = string
 }
 
-variable "keyName" {
-  description = "AWS Key Pair"
-  type        = string
+variable "operatingSystem" {
+  type = string
 }
 
-variable "securityGroupId" {
-  description = "Security Group ID"
-  type        = string
+variable "owner" {
+  type = string
 }

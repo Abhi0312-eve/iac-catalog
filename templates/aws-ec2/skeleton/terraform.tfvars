@@ -1,5 +1,5 @@
 instanceName    = "${{ values.instanceName }}"
 instanceType    = "${{ values.instanceType }}"
 region          = "${{ values.region }}"
-keyName         = "${{ values.keyName }}"
-securityGroupId = "${{ values.securityGroupId }}"
+operatingSystem = "${{ values.operatingSystem }}"
+owner           = "${{ values.owner }}"

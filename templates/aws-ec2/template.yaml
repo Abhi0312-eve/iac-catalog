@@ -20,8 +20,8 @@ spec:
         - instanceName
         - region
         - instanceType
-        - keyName
-        - securityGroupId
+        - operatingSystem
+        - owner
 
       properties:
         instanceName:
@@ -45,16 +45,19 @@ spec:
             - t2.micro
             - t3.micro
             - t3.small
-
-        keyName:
-          title: EC2 Key Pair
+ 
+        operatingSystem:
+          title: Operating System
           type: string
-          description: Existing AWS Key Pair Name
+          default: Amazon Linux 2023
+          enum:
+            - Amazon Linux 2023
+            - Ubuntu 24.04
 
-        securityGroupId:
-          title: Security Group
+        owner:
+          title: Owner
           type: string
-          description: Example: sg-0123456789abcdef0      
+          description: Owner of the EC2 instance
 
   steps:
     - id: fetch
@@ -66,6 +69,9 @@ spec:
           instanceName: ${{ parameters.instanceName }}
           region: ${{ parameters.region }}
           instanceType: ${{ parameters.instanceType }}
+          operatingSystem: ${{ parameters.operatingSystem }}
+          owner: ${{ parameters.owner }}
+
 
     - id: publish
       name: Publish Repository
