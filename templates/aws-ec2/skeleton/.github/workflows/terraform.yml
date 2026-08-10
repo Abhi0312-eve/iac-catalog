@@ -40,6 +40,19 @@ jobs:
 
       - name: Terraform Apply
         run: terraform apply -auto-approve
+      
+      - name: Save EC2 Details
+        run: |
+          cat > ec2-details.json <<EOF
+          {
+            "instance_id": "$(terraform output -raw instance_id)",
+            "region": "$(terraform output -raw region)",
+            "public_ip": "$(terraform output -raw public_ip)",
+            "private_ip": "$(terraform output -raw private_ip)"
+          }
+          EOF
+
+          cat ec2-details.json
 
       - name: Show EC2 Details
         run: |
@@ -51,3 +64,6 @@ jobs:
           echo "Public IP   : $(terraform output -raw public_ip)"
           echo "Private IP  : $(terraform output -raw private_ip)"
           echo "================================"
+
+      
+
