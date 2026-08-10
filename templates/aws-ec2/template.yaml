@@ -86,3 +86,6 @@ spec:
     links:
       - title: Repository
         url: ${{ steps.publish.output.remoteUrl }}
+
+      - title: Terraform Workflow
+        url: ${{ steps.publish.output.remoteUrl }}/actions

@@ -47,6 +47,7 @@ jobs:
           echo "EC2 Provisioning Successful"
           echo "================================"
           echo "Instance ID : $(terraform output -raw instance_id)"
+          echo "Region      : $(terraform output -raw region)"
           echo "Public IP   : $(terraform output -raw public_ip)"
           echo "Private IP  : $(terraform output -raw private_ip)"
           echo "================================"
