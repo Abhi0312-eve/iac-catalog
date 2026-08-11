@@ -11,23 +11,32 @@ jobs:
 
     permissions:
       contents: read
+      id-token: write
 
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v4
+
 
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v3
         with:
           terraform_version: 1.12.2
 
+      - name: Show GitHub Context
+        run: |
+          echo "Repository: $GITHUB_REPOSITORY"
+          echo "Ref: $GITHUB_REF"
+          echo "Branch: $GITHUB_REF_NAME"
+          echo "Event: $GITHUB_EVENT_NAME"
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v4
         with:
-          aws-access-key-id: ${{ '${{ secrets.AWS_ACCESS_KEY_ID }}' }}
-          aws-secret-access-key: ${{ '${{ secrets.AWS_SECRET_ACCESS_KEY }}' }}
-          aws-session-token: ${{ '${{ secrets.AWS_SESSION_TOKEN }}' }}
-          aws-region: ${{ values.region }}
+         role-to-assume: arn:aws:iam::982344023689:role/GitHubActionsTerraform
+         aws-region: ${{ values.region }}
+
+      - name: Verify AWS Identity
+        run: aws sts get-caller-identity
 
       - name: Terraform Init
         run: terraform init
@@ -40,7 +49,7 @@ jobs:
 
       - name: Terraform Apply
         run: terraform apply -auto-approve
-      
+
       - name: Save EC2 Details
         run: |
           cat > ec2-details.json <<EOF
@@ -51,9 +60,7 @@ jobs:
             "private_ip": "$(terraform output -raw private_ip)"
           }
           EOF
-
           cat ec2-details.json
-
       - name: Show EC2 Details
         run: |
           echo "================================"
@@ -64,6 +71,3 @@ jobs:
           echo "Public IP   : $(terraform output -raw public_ip)"
           echo "Private IP  : $(terraform output -raw private_ip)"
           echo "================================"
-
-      
-
