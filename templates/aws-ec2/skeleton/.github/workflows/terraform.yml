@@ -47,8 +47,8 @@ jobs:
       - name: Terraform Plan
         run: terraform plan
 
-      - name: Terraform Apply
-        run: terraform apply -auto-approve
+      #- name: Terraform Apply
+      #  run: terraform apply -auto-approve
 
       - name: Save EC2 Details
         run: |
