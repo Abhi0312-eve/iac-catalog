@@ -29,6 +29,7 @@ jobs:
           echo "Ref: $GITHUB_REF"
           echo "Branch: $GITHUB_REF_NAME"
           echo "Event: $GITHUB_EVENT_NAME"
+
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v4
         with:
@@ -47,8 +48,8 @@ jobs:
       - name: Terraform Plan
         run: terraform plan
 
-      #- name: Terraform Apply
-      #  run: terraform apply -auto-approve
+      - name: Terraform Apply
+        run: terraform apply -auto-approve
 
       - name: Save EC2 Details
         run: |
