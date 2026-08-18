@@ -39,6 +39,31 @@ jobs:
       - name: Verify AWS Identity
         run: aws sts get-caller-identity
 
+      - name: Test S3 API
+        env:
+          TEST_BUCKET: ${{ values.bucketName }}
+          TEST_REGION: ${{ values.region }}
+        run: |
+          echo "Bucket: $TEST_BUCKET"
+          echo "Region: $TEST_REGION"
+
+          aws s3api create-bucket \
+            --bucket "$TEST_BUCKET" \
+            --region "$TEST_REGION" \
+            --create-bucket-configuration LocationConstraint="$TEST_REGION"
+
+          echo "CREATE completed"
+
+          aws s3api head-bucket \
+            --bucket "$TEST_BUCKET"
+
+          echo "HEAD completed"
+
+          aws s3api get-bucket-location \
+            --bucket "$TEST_BUCKET"
+
+          echo "LOCATION completed"
+
       - name: Terraform Init
         run: terraform init
 
@@ -49,7 +74,7 @@ jobs:
         run: terraform plan
 
       - name: Terraform Apply
-        run: terraform apply -auto-approve
+        run: terraform apply -auto-approve -lock-timeout=5m
 
       - name: Save S3 Details
         run: |
