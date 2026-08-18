@@ -49,6 +49,11 @@ jobs:
       - name: Terraform Plan
         run: terraform plan
 
+      - name: Terraform Debug
+        run: |
+          terraform version
+          terraform providers
+
       - name: Terraform Apply
         run: terraform apply -auto-approve
 
