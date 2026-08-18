@@ -1,5 +1,0 @@
-instanceName    = "${{ values.instanceName }}"
-instanceType    = "${{ values.instanceType }}"
-region          = "${{ values.region }}"
-operatingSystem = "${{ values.operatingSystem }}"
-owner           = "${{ values.owner }}"

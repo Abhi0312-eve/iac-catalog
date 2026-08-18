@@ -31,28 +31,20 @@ spec:
         region:
           title: AWS Region
           type: string
-          default: us-east-2
-          enum:
-            - us-east-1
-            - us-east-2
-            - us-west-2
+          description: AWS region where the EC2 instance will be provisioned
+          ui:field: AwsRegionPicker
 
         instanceType:
           title: Instance Type
           type: string
-          default: t2.micro
-          enum:
-            - t2.micro
-            - t3.micro
-            - t3.small
- 
+          description: EC2 instance type to provision
+          ui:field: AwsInstanceTypePicker
+
         operatingSystem:
           title: Operating System
           type: string
-          default: Amazon Linux 2023
-          enum:
-            - Amazon Linux 2023
-            - Ubuntu 24.04
+          description: Operating system / AMI to provision
+          ui:field: AwsOperatingSystemPicker
 
         owner:
           title: Owner
