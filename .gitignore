@@ -54,3 +54,15 @@ e2e-test-report/
 
 # Cache
 .cache/
+
+# Terraform
+.terraform/
+*.tfstate
+*.tfstate.*
+*.tfvars
+crash.log
+crash.*.log
+
+# Terraform plans
+*.tfplan
+*.tfplan.json
