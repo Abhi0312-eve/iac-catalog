@@ -46,12 +46,26 @@ jobs:
 
       - name: Terraform Plan
         env:
-          TF_VAR_dbPassword: ${{ secrets.DB_PASSWORD }}
+          TF_VAR_databaseName: ${{ values.databaseName }}
+          TF_VAR_region: ${{ values.region }}
+          TF_VAR_instanceClass: ${{ values.instanceClass }}
+          TF_VAR_storage: ${{ values.storage }}
+          TF_VAR_environment: ${{ values.environment }}
+          TF_VAR_owner: ${{ values.owner }}
+          TF_VAR_dbUsername: ${{ values.dbUsername }}
+          TF_VAR_dbPassword: $${{ secrets.DB_PASSWORD }}
         run: terraform plan
 
       - name: Terraform Apply
         env:
-          TF_VAR_dbPassword: ${{ secrets.DB_PASSWORD }}
+          TF_VAR_databaseName: ${{ values.databaseName }}
+          TF_VAR_region: ${{ values.region }}
+          TF_VAR_instanceClass: ${{ values.instanceClass }}
+          TF_VAR_storage: ${{ values.storage }}
+          TF_VAR_environment: ${{ values.environment }}
+          TF_VAR_owner: ${{ values.owner }}
+          TF_VAR_dbUsername: ${{ values.dbUsername }}
+          TF_VAR_dbPassword: $${{ secrets.DB_PASSWORD }}
         run: terraform apply -auto-approve
 
       - name: Show RDS Details

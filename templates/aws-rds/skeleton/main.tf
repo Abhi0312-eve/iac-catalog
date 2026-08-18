@@ -13,7 +13,7 @@ resource "aws_db_instance" "postgres" {
   storage_encrypted = true
 
   db_name  = replace(var.databaseName, "-", "_")
-  username = "${{ values.dbUsername }}"
+  username = var.dbUsername
   password = var.dbPassword
 
   db_subnet_group_name = var.dbSubnetGroupName
