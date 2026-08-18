@@ -1,6 +1,5 @@
 resource "aws_s3_bucket" "bucket" {
   bucket = var.bucketName
-  region = var.region
 
   tags = {
     Name        = var.bucketName
