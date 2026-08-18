@@ -67,11 +67,36 @@ jobs:
       - name: Terraform Init
         run: terraform init
 
+      - name: Create S3 Bucket
+        env:
+          BUCKET_NAME: ${{ values.bucketName }}
+          AWS_REGION: ${{ values.region }}
+        run: |
+          aws s3api create-bucket \
+            --bucket "$BUCKET_NAME" \
+            --region "$AWS_REGION" \
+            --create-bucket-configuration LocationConstraint="$AWS_REGION"
+
+      - name: Import S3 Bucket
+        env:
+          BUCKET_NAME: ${{ values.bucketName }}
+          AWS_REGION: ${{ values.region }}
+        run: |
+          terraform import \
+            -var="bucketName=$BUCKET_NAME" \
+            -var="region=$AWS_REGION" \
+            -var="environment=${{ values.environment }}" \
+            -var="owner=${{ values.owner }}" \
+            aws_s3_bucket.bucket "$BUCKET_NAME"
+
       - name: Terraform Validate
         run: terraform validate
 
       - name: Terraform Plan
         run: terraform plan
+
+      - name: Terraform Apply
+        run: terraform apply -auto-approve
 
       - name: Terraform Apply
         run: terraform apply -auto-approve -lock-timeout=5m
