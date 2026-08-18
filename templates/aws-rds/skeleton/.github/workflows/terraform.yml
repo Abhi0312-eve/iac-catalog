@@ -1,0 +1,67 @@
+name: Provision AWS RDS PostgreSQL
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  terraform:
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: read
+      id-token: write
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: 1.12.2
+
+      - name: Show GitHub Context
+        run: |
+          echo "Repository: $GITHUB_REPOSITORY"
+          echo "Ref: $GITHUB_REF"
+          echo "Branch: $GITHUB_REF_NAME"
+          echo "Event: $GITHUB_EVENT_NAME"
+
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: arn:aws:iam::982344023689:role/GitHubActionsTerraform
+          aws-region: ${{ values.region }}
+
+      - name: Verify AWS Identity
+        run: aws sts get-caller-identity
+
+      - name: Terraform Init
+        run: terraform init
+
+      - name: Terraform Validate
+        run: terraform validate
+
+      - name: Terraform Plan
+        env:
+          TF_VAR_dbPassword: ${{ secrets.DB_PASSWORD }}
+        run: terraform plan
+
+      - name: Terraform Apply
+        env:
+          TF_VAR_dbPassword: ${{ secrets.DB_PASSWORD }}
+        run: terraform apply -auto-approve
+
+      - name: Show RDS Details
+        run: |
+          echo "================================"
+          echo "RDS Provisioning Successful"
+          echo "================================"
+          echo "Database Identifier : $(terraform output -raw database_identifier)"
+          echo "Database Name       : $(terraform output -raw database_name)"
+          echo "Region              : $(terraform output -raw region)"
+          echo "Port                : $(terraform output -raw database_port)"
+          echo "Endpoint            : $(terraform output -raw database_endpoint)"
+          echo "================================"

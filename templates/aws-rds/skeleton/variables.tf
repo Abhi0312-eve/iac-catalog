@@ -56,11 +56,6 @@ variable "vpcId" {
   default     = "vpc-0da802305383c0b6b"
 }
 
-variable "dbUsername" {
-  description = "PostgreSQL master username"
-  type        = string
-  default     = "postgres"
-}
 
 variable "dbPassword" {
   description = "PostgreSQL master password"
