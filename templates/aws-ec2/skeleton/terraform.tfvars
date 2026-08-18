@@ -1,0 +1,5 @@
+instanceName    = "${{ values.instanceName }}"
+region          = "${{ values.region }}"
+instanceType    = "${{ values.instanceType }}"
+operatingSystem = "${{ values.operatingSystem }}"
+owner           = "${{ values.owner }}"
