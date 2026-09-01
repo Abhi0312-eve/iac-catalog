@@ -1,3 +1,9 @@
+## 1.0.1 - 2026-09-01
+
+### Changes
+
+- fix: update aws ec2 module baseline
+
 # Changelog
 
 ## 1.0.0 - 2026-09-01
