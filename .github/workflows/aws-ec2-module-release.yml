@@ -3,7 +3,7 @@ name: AWS EC2 Module Release
 on:
   push:
     branches:
-      - main
+      - master
     paths:
       - 'templates/aws-ec2/skeleton/**'
       - 'templates/aws-ec2/VERSION'
