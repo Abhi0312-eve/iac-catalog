@@ -8,4 +8,4 @@ resource "aws_instance" "ec2" {
   }
 }
 
-# AWS EC2 module baseline - v1
+# AWS EC2 module baseline - v1.0.1-test
