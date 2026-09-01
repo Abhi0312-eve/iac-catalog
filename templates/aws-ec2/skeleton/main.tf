@@ -7,3 +7,5 @@ resource "aws_instance" "ec2" {
     Owner = var.owner
   }
 }
+
+# AWS EC2 module baseline
