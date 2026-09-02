@@ -1,3 +1,9 @@
+## 1.0.2 - 2026-09-02
+
+### Changes
+
+- fix: test aws ec2 module v1.0.2 release
+
 ## 1.0.1 - 2026-09-01
 
 ### Changes
