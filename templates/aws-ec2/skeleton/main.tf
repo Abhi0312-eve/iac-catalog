@@ -2,6 +2,10 @@ resource "aws_instance" "ec2" {
   ami           = var.operatingSystem
   instance_type = var.instanceType
 
+  root_block_device {
+    volume_size = var.storageSize
+  }
+
   tags = {
     Name  = var.instanceName
     Owner = var.owner

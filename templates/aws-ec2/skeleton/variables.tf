@@ -20,3 +20,8 @@ variable "operatingSystem" {
 variable "owner" {
   type = string
 }
+
+variable "storageSize" {
+  description = "EC2 root volume size in GB"
+  type        = number
+}
