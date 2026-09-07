@@ -1,11 +1,6 @@
 resource "aws_s3_bucket" "bucket" {
   bucket = var.bucketName
 
-  tags = {
-    Name        = var.bucketName
-    Environment = var.environment
-    Owner       = var.owner
-  }
 }
 
 resource "aws_s3_bucket_versioning" "bucket" {

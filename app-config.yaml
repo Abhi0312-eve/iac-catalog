@@ -1,6 +1,6 @@
 app:
   title: Scaffolded Backstage App
-  baseUrl: http://localhost:3000
+  baseUrl: https://3.128.24.212
 
   # Enable all packages by default, this will discover packages from packages/app/package.json
   packages: all
@@ -21,7 +21,7 @@ backend:
   # auth:
   #   keys:
   #     - secret: ${BACKEND_SECRET}
-  baseUrl: http://localhost:7007
+  baseUrl: https://3.128.24.212
   listen:
     port: 7007
     # Uncomment the following host directive to bind to specific interfaces
@@ -115,6 +115,18 @@ catalog:
       target: ./templates/aws-ec2/template.yaml
       rules:
         - allow: [Template]    
+
+    # AWS S3 Template
+    - type: file
+      target: ./templates/aws-s3/template.yaml
+      rules:
+        - allow: [Template]
+
+    # AWS RDS PostgreSQL Template
+    - type: file
+      target: ./templates/aws-rds/template.yaml
+      rules:
+        - allow: [Template]
 
     # Local example template
     - type: file

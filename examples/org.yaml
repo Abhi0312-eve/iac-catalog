@@ -6,6 +6,51 @@ metadata:
   name: guest
 spec:
   memberOf: [guests]
+
+---
+apiVersion: backstage.io/v1alpha1
+kind: User
+metadata:
+  name: abhijeet-sorte
+spec:
+  profile:
+    displayName: Abhijeet Sorte
+    email: abhijeet.sorte@eversana.com
+  memberOf: [guests]
+
+---
+apiVersion: backstage.io/v1alpha1
+kind: User
+metadata:
+  name: jerry-locke
+spec:
+  profile:
+    displayName: Jerry Locke
+    email: jerry.locke@eversana.com
+  memberOf: [guests]
+
+---
+apiVersion: backstage.io/v1alpha1
+kind: User
+metadata:
+  name: pradip-pawar
+spec:
+  profile:
+    displayName: Pradip Pawar
+    email: pradip.pawar@eversana.com
+  memberOf: [guests]
+
+---
+apiVersion: backstage.io/v1alpha1
+kind: User
+metadata:
+  name: akinola-soyinka
+spec:
+  profile:
+    displayName: Seun Soyinka
+    email: Akinola.Soyinka@Eversana.com
+  memberOf: [guests]
+
 ---
 # https://backstage.io/docs/features/software-catalog/descriptor-format#kind-group
 apiVersion: backstage.io/v1alpha1

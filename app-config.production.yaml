@@ -1,6 +1,6 @@
 app:
   # Should be the same as backend.baseUrl when using the `app-backend` plugin.
-  baseUrl: https://18.220.149.34
+  baseUrl: https://3.128.24.212
 
 backend:
   # Note that the baseUrl should be the URL that the browser and other clients
@@ -8,13 +8,13 @@ backend:
   # reachable not just from within the backend host, but from all of your
   # callers. When its value is "http://localhost:7007", it's strictly private
   # and can't be reached by others.
-  baseUrl: https://18.220.149.34
+  baseUrl: https://3.128.24.212
   # The listener can also be expressed as a single <host>:<port> string. In this case we bind to
   # all interfaces, the most permissive setting. The right value depends on your specific deployment.
   listen: ':7007'
 
   cors:
-    origin: https://18.220.149.34
+    origin: https://3.128.24.212
     methods: [GET, HEAD, PATCH, POST, PUT, DELETE]
     credentials: true
   
@@ -40,6 +40,15 @@ auth:
   providers:
     guest:
       dangerouslyAllowOutsideDevelopment: true
+    
+    microsoft:
+      development:
+        clientId: ${AZURE_CLIENT_ID}
+        clientSecret: ${AZURE_CLIENT_SECRET}
+        tenantId: ${AZURE_TENANT_ID}
+        signIn:
+          resolvers:
+           - resolver: emailMatchingUserEntityProfileEmail
 
 catalog:
   # Overrides the default list locations from app-config.yaml as these contain example data.
@@ -63,6 +72,24 @@ catalog:
       target: ./templates/aws-ec2/template.yaml
       rules:
         - allow: [Template]      
+
+    # AWS EC2 Terraform Module Catalog Entry
+    - type: file
+      target: ./catalog/modules/aws-ec2-module.yaml
+      rules:
+        - allow: [Component]
+
+    # AWS S3 Template
+    - type: file
+      target: ./templates/aws-s3/template.yaml
+      rules:
+        - allow: [Template]
+
+    # AWS RDS PostgreSQL Template
+    - type: file
+      target: ./templates/aws-rds/template.yaml
+      rules:
+        - allow: [Template]
 
     # Local example organizational data
     - type: file

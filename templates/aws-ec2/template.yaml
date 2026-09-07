@@ -15,6 +15,17 @@ spec:
   type: infrastructure
 
   parameters:
+    - title: Terraform Module
+      required:
+        - moduleVersion
+
+      properties:
+        moduleVersion:
+          title: Module Version
+          type: string
+          description: Version of the internal AWS EC2 module
+          ui:field: ModuleVersionPicker
+
     - title: EC2 Configuration
       required:
         - instanceName
@@ -46,6 +57,14 @@ spec:
           description: Operating system / AMI to provision
           ui:field: AwsOperatingSystemPicker
 
+        storageSize:
+          title: Storage Size (GB)
+          type: integer
+          description: Root volume size in GB
+          minimum: 1
+          default: 20
+          ui:field: ModuleStorageSizePicker
+
         owner:
           title: Owner
           type: string
@@ -56,12 +75,14 @@ spec:
       name: Fetch Terraform Template
       action: fetch:template
       input:
-        url: ./skeleton
+        url: https://github.com/Abhi0312-eve/iac-catalog/tree/aws-ec2-${{ parameters.moduleVersion }}/templates/aws-ec2/skeleton
         values:
+          moduleVersion: ${{ parameters.moduleVersion }}
           instanceName: ${{ parameters.instanceName }}
           region: ${{ parameters.region }}
           instanceType: ${{ parameters.instanceType }}
           operatingSystem: ${{ parameters.operatingSystem }}
+          storageSize: ${{ parameters.storageSize }}
           owner: ${{ parameters.owner }}
 
 

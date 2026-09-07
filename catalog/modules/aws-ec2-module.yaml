@@ -1,0 +1,21 @@
+apiVersion: backstage.io/v1alpha1
+kind: Component
+
+metadata:
+  name: aws-ec2-module
+  title: AWS EC2 Terraform Module
+  description: Internal Terraform implementation used by the AWS EC2 Backstage template
+
+  annotations:
+    backstage.io/techdocs-ref: dir:.
+    github.com/project-slug: Abhi0312-eve/iac-catalog
+
+  tags:
+    - aws
+    - ec2
+    - terraform
+
+spec:
+  type: infrastructure-module
+  lifecycle: production
+  owner: user:guest

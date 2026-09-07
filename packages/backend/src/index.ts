@@ -25,7 +25,13 @@ backend.add(import('@backstage/plugin-techdocs-backend'));
 
 // auth plugin
 backend.add(import('@backstage/plugin-auth-backend'));
-// See https://backstage.io/docs/backend-system/building-backends/migrating#the-auth-plugin
+
+// Microsoft Entra ID authentication
+backend.add(
+  import('@backstage/plugin-auth-backend-module-microsoft-provider'),
+);
+
+// Guest authentication - temporary fallback during SSO setup
 backend.add(import('@backstage/plugin-auth-backend-module-guest-provider'));
 // See https://backstage.io/docs/auth/guest/provider
 
@@ -68,5 +74,8 @@ backend.add(import('@backstage/plugin-signals-backend'));
 
 // mcp actions plugin
 backend.add(import('@backstage/plugin-mcp-actions-backend'));
+
+// AWS discovery plugin
+backend.add(import('./aws/plugin'));
 
 backend.start();
