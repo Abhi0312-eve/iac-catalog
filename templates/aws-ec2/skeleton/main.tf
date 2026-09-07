@@ -9,6 +9,8 @@ resource "aws_instance" "ec2" {
   tags = {
     Name  = var.instanceName
     Owner = var.owner
+    ManagedBy = "Backstage"
+    Platform  = "IDP"
   }
 }
 
