@@ -1,3 +1,9 @@
+## 1.1.0 - 2026-09-04
+
+### Changes
+
+- feat: add configurable EC2 storage size
+
 ## 1.0.2 - 2026-09-02
 
 ### Changes
