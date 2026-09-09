@@ -1,6 +1,7 @@
 resource "aws_instance" "ec2" {
   ami           = var.operatingSystem
   instance_type = var.instanceType
+  iam_instance_profile = "BackstageEC2SSMInstanceProfile"
 
   root_block_device {
     volume_size = var.storageSize
