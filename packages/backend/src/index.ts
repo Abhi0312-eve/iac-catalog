@@ -77,5 +77,6 @@ backend.add(import('@backstage/plugin-mcp-actions-backend'));
 
 // AWS discovery plugin
 backend.add(import('./aws/plugin'));
+backend.add(import('./aws/catalogModule'));
 
 backend.start();
