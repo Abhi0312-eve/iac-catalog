@@ -3,6 +3,8 @@ import {
   coreServices,
 } from '@backstage/backend-plugin-api';
 import express from 'express';
+import fs from 'fs/promises';
+import path from 'path';
 
 import {
   getAwsAmis,
@@ -133,6 +135,198 @@ const awsPlugin = createBackendPlugin({
           }
         });
 
+        router.get(
+          '/server-config/versions',
+          async (_req, res) => {
+            try {
+              const serverConfigRoot = path.join(
+                process.cwd(),
+                'templates',
+                'server-config',
+              );
+
+              const entries = await fs.readdir(
+                serverConfigRoot,
+                {
+                  withFileTypes: true,
+                },
+              );
+
+              const versions: Array<{ version: string }> = [];
+
+              for (const entry of entries) {
+                if (!entry.isDirectory()) {
+                  continue;
+                }
+
+                const versionFile = path.join(
+                  serverConfigRoot,
+                  entry.name,
+                  'VERSION',
+                );
+
+                try {
+                  const version = (
+                    await fs.readFile(
+                      versionFile,
+                      'utf8',
+                    )
+                  ).trim();
+
+                  if (version) {
+                    versions.push({
+                      version: `v${version.replace(/^v/, '')}`,
+                    });
+                  }
+                } catch {
+                  // Ignore directories without a VERSION file.
+                }
+              }
+
+              versions.sort((a, b) =>
+                b.version.localeCompare(
+                  a.version,
+                  undefined,
+                  {
+                    numeric: true,
+                    sensitivity: 'base',
+                  },
+                ),
+              );
+
+              res.json({
+                versions,
+                latest: versions[0]?.version ?? null,
+              });
+            } catch (error) {
+              console.error(
+                'Failed to discover server configuration versions:',
+                error,
+              );
+
+              res.status(500).json({
+                error:
+                  'Failed to discover server configuration versions',
+              });
+            }
+          },
+        );
+
+        router.get(
+          '/server-config/services',
+          async (req, res) => {
+            try {
+              const version = req.query.version;
+
+              if (
+                typeof version !== 'string' ||
+                !version.trim()
+              ) {
+                res.status(400).json({
+                  error:
+                    'version query parameter is required',
+                });
+                return;
+              }
+
+              const normalizedVersion = version
+                .trim()
+                .replace(/^v/, '');
+
+              const configFile = path.join(
+                process.cwd(),
+                'templates',
+                'server-config',
+                `v${normalizedVersion}`,
+                'config.yaml',
+              );
+
+              const config = await fs.readFile(
+                configFile,
+                'utf8',
+              );
+
+              const services: Array<{
+                name: string;
+                title: string;
+                description: string;
+              }> = [];
+
+              const lines = config.split(/\r?\n/);
+
+              let currentService:
+                | {
+                    name: string;
+                    title: string;
+                    description: string;
+                  }
+                | null = null;
+
+              for (const line of lines) {
+                const nameMatch = line.match(
+                  /^\s+-\s+name:\s*(.+)\s*$/,
+                );
+
+                if (nameMatch) {
+                  if (currentService) {
+                    services.push(currentService);
+                  }
+
+                  currentService = {
+                    name: nameMatch[1].trim(),
+                    title: '',
+                    description: '',
+                  };
+
+                  continue;
+                }
+
+                if (!currentService) {
+                  continue;
+                }
+
+                const titleMatch = line.match(
+                  /^\s+title:\s*(.+)\s*$/,
+                );
+
+                if (titleMatch) {
+                  currentService.title =
+                    titleMatch[1].trim();
+                  continue;
+                }
+
+                const descriptionMatch = line.match(
+                  /^\s+description:\s*(.+)\s*$/,
+                );
+
+                if (descriptionMatch) {
+                  currentService.description =
+                    descriptionMatch[1].trim();
+                }
+              }
+
+              if (currentService) {
+                services.push(currentService);
+              }
+
+              res.json({
+                version: `v${normalizedVersion}`,
+                services,
+              });
+            } catch (error) {
+              console.error(
+                'Failed to load server configuration services:',
+                error,
+              );
+
+              res.status(404).json({
+                error:
+                  'Server configuration version not found',
+              });
+            }
+          },
+        );
+
         router.get('/regions', async (_req, res) => {
           try {
             const regions = await getAwsRegions();
@@ -217,6 +411,16 @@ const awsPlugin = createBackendPlugin({
 
         httpRouter.addAuthPolicy({
           path: '/module-versions',
+          allow: 'unauthenticated',
+        });
+
+        httpRouter.addAuthPolicy({
+          path: '/server-config/versions',
+          allow: 'unauthenticated',
+        });
+
+        httpRouter.addAuthPolicy({
+          path: '/server-config/services',
           allow: 'unauthenticated',
         });
 

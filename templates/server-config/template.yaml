@@ -1,0 +1,59 @@
+apiVersion: scaffolder.backstage.io/v1beta3
+kind: Template
+
+metadata:
+  name: server-configuration
+  title: Server Configuration Management
+  description: Configure services on existing AWS EC2 instances using Ansible and SSM
+  tags:
+    - aws
+    - configuration
+    - ansible
+    - ssm
+
+spec:
+  owner: user:guest
+  type: configuration
+
+  parameters:
+    - title: Configuration
+      required:
+        - configurationVersion
+        - target
+        - service
+      properties:
+        configurationVersion:
+          title: Configuration Version
+          type: string
+          description: Version of the server configuration definition
+          ui:field: ServerConfigVersionPicker
+
+        target:
+          title: Target EC2
+          type: string
+          description: AWS EC2 instance to configure
+          ui:field: TargetEc2Picker
+
+        service:
+          title: Service
+          type: string
+          description: Service to install or configure
+          ui:field: ServicePicker
+
+  steps:
+    - id: debug
+      name: Configuration Request
+      action: debug:log
+      input:
+        message: >-
+          Configuration version=${{ parameters.configurationVersion }},
+          target=${{ parameters.target }},
+          service=${{ parameters.service }}
+
+  output:
+    text:
+      - title: Configuration
+        content: >-
+          Requested ${{ parameters.service }} configuration
+          version ${{ parameters.configurationVersion }}
+          for ${{ parameters.target }}.

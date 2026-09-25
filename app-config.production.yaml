@@ -91,6 +91,12 @@ catalog:
       rules:
         - allow: [Template]
 
+    # Server Configuration Management Template
+    - type: file
+      target: ./templates/server-config/template.yaml
+      rules:
+        - allow: [Template]
+
     # Local example organizational data
     - type: file
       target: ./examples/org.yaml

@@ -1,0 +1,14 @@
+version: v1.0.0
+
+services:
+  - name: apache
+    title: Apache HTTP Server
+    description: Install and configure Apache HTTP Server
+
+  - name: tomcat
+    title: Apache Tomcat
+    description: Install and configure Apache Tomcat
+
+  - name: nginx
+    title: Nginx
+    description: Install and configure Nginx
