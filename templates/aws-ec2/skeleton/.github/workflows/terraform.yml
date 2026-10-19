@@ -13,28 +13,26 @@ jobs:
       contents: read
       id-token: write
 
+    env:
+      SERVICE: "${{ values.service }}"
+      CONFIGURATION_VERSION: "${{ values.configurationVersion }}"
+      SERVICE_PORT: "${{ values.port }}"
+      MODULE_VERSION: "${{ values.moduleVersion }}"
+
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v4
-
 
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v3
         with:
           terraform_version: 1.12.2
 
-      - name: Show GitHub Context
-        run: |
-          echo "Repository: $GITHUB_REPOSITORY"
-          echo "Ref: $GITHUB_REF"
-          echo "Branch: $GITHUB_REF_NAME"
-          echo "Event: $GITHUB_EVENT_NAME"
-
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v4
         with:
-         role-to-assume: arn:aws:iam::982344023689:role/GitHubActionsTerraform
-         aws-region: ${{ values.region }}
+          role-to-assume: arn:aws:iam::982344023689:role/GitHubActionsTerraform
+          aws-region: "${{ values.region }}"
 
       - name: Verify AWS Identity
         run: aws sts get-caller-identity
@@ -62,13 +60,132 @@ jobs:
           }
           EOF
           cat ec2-details.json
+
+      - name: Wait for SSM Online
+        shell: bash
+        run: |
+          set -euo pipefail
+          INSTANCE_ID="$(terraform output -raw instance_id)"
+          REGION="$(terraform output -raw region)"
+          echo "Waiting for SSM on ${INSTANCE_ID} in ${REGION}..."
+
+          for attempt in $(seq 1 60); do
+            STATUS="$(aws ssm describe-instance-information \
+              --region "$REGION" \
+              --filters "Key=InstanceIds,Values=${INSTANCE_ID}" \
+              --query 'InstanceInformationList[0].PingStatus' \
+              --output text 2>/dev/null || true)"
+
+            if [[ "$STATUS" == "Online" ]]; then
+              echo "SSM is Online."
+              exit 0
+            fi
+
+            echo "Attempt ${attempt}/60: SSM status=${STATUS:-unknown}"
+            sleep 10
+          done
+
+          echo "ERROR: Instance did not become SSM Online within 10 minutes."
+          exit 1
+
+      - name: Configure Service through SSM
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          INSTANCE_ID="$(terraform output -raw instance_id)"
+          REGION="$(terraform output -raw region)"
+
+          if [[ ! "$SERVICE" =~ ^(apache|nginx|tomcat)$ ]]; then
+            echo "ERROR: Unsupported service: ${SERVICE}"
+            exit 1
+          fi
+
+          if [[ ! "$MODULE_VERSION" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+            echo "ERROR: Invalid module version: ${MODULE_VERSION}"
+            exit 1
+          fi
+
+          if [[ ! "$CONFIGURATION_VERSION" =~ ^v?[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+            echo "ERROR: Invalid configuration version."
+            exit 1
+          fi
+
+          if [[ ! "$SERVICE_PORT" =~ ^[0-9]+$ ]] ||
+             (( SERVICE_PORT < 1 || SERVICE_PORT > 65535 )); then
+            echo "ERROR: Invalid service port."
+            exit 1
+          fi
+
+          SCRIPT_URL="https://raw.githubusercontent.com/Abhi0312-eve/iac-catalog/aws-ec2-${MODULE_VERSION}/templates/aws-ec2/skeleton/scripts/configure-service.sh"
+
+          # SSM downloads the script on the instance. Only a short command
+          # payload is sent through SendCommand.
+          REMOTE_COMMAND="set -eu
+          curl -fsSL '${SCRIPT_URL}' -o /tmp/backstage-configure-service.sh
+          chmod 0755 /tmp/backstage-configure-service.sh
+          /usr/bin/env bash /tmp/backstage-configure-service.sh '${SERVICE}' '${CONFIGURATION_VERSION}' '${SERVICE_PORT}'"
+
+          COMMANDS_JSON="$(jq -cn --arg command "$REMOTE_COMMAND" \
+            '{commands: [$command]}')"
+
+          COMMAND_ID="$(aws ssm send-command \
+            --region "$REGION" \
+            --instance-ids "$INSTANCE_ID" \
+            --document-name AWS-RunShellScript \
+            --comment "Backstage initial service configuration" \
+            --parameters "$COMMANDS_JSON" \
+            --query 'Command.CommandId' \
+            --output text)"
+
+          echo "SSM Command ID: ${COMMAND_ID}"
+
+          STATUS="Pending"
+          for attempt in $(seq 1 60); do
+            RESULT="$(aws ssm get-command-invocation \
+              --region "$REGION" \
+              --command-id "$COMMAND_ID" \
+              --instance-id "$INSTANCE_ID" \
+              --output json 2>/dev/null || true)"
+
+            if [[ -n "$RESULT" ]] && jq -e '.Status' >/dev/null 2>&1 <<< "$RESULT"; then
+              STATUS="$(jq -r '.Status' <<< "$RESULT")"
+
+              case "$STATUS" in
+                Success|Failed|Cancelled|TimedOut|Cancelling)
+                  break
+                  ;;
+              esac
+            fi
+
+            echo "Attempt ${attempt}/60: SSM command status=${STATUS}"
+            sleep 5
+          done
+
+          if [[ "$STATUS" != "Success" ]]; then
+            echo "ERROR: Initial service configuration failed: ${STATUS}"
+            if [[ -n "${RESULT:-}" ]] && jq -e '.Status' >/dev/null 2>&1 <<< "$RESULT"; then
+              echo "----- Remote stdout -----"
+              jq -r '.StandardOutputContent // ""' <<< "$RESULT"
+              echo "----- Remote stderr -----"
+              jq -r '.StandardErrorContent // ""' <<< "$RESULT"
+            fi
+            exit 1
+          fi
+
+          echo "----- Remote configuration output -----"
+          jq -r '.StandardOutputContent // ""' <<< "$RESULT"
+          echo "----- Remote error output -----"
+          jq -r '.StandardErrorContent // ""' <<< "$RESULT"
+          echo "Initial service configuration succeeded."
+
       - name: Show EC2 Details
+        if: always()
         run: |
           echo "================================"
-          echo "EC2 Provisioning Successful"
+          echo "EC2 Provisioning Workflow"
           echo "================================"
-          echo "Instance ID : $(terraform output -raw instance_id)"
-          echo "Region      : $(terraform output -raw region)"
-          echo "Public IP   : $(terraform output -raw public_ip)"
-          echo "Private IP  : $(terraform output -raw private_ip)"
+          if [[ -f ec2-details.json ]]; then
+            cat ec2-details.json
+          fi
           echo "================================"
