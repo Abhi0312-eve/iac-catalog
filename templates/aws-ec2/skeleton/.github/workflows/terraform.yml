@@ -69,7 +69,7 @@ jobs:
           REGION="$(terraform output -raw region)"
           echo "Waiting for SSM on ${INSTANCE_ID} in ${REGION}..."
 
-          for attempt in $(seq 1 60); do
+          for attempt in $(seq 1 12); do
             STATUS="$(aws ssm describe-instance-information \
               --region "$REGION" \
               --filters "Key=InstanceIds,Values=${INSTANCE_ID}" \
@@ -81,11 +81,11 @@ jobs:
               exit 0
             fi
 
-            echo "Attempt ${attempt}/60: SSM status=${STATUS:-unknown}"
+            echo "Attempt ${attempt}/12: SSM status=${STATUS:-unknown}"
             sleep 10
           done
 
-          echo "ERROR: Instance did not become SSM Online within 10 minutes."
+          echo "ERROR: Instance did not become SSM Online within 2 minutes."
           exit 1
 
       - name: Configure Service through SSM
@@ -101,7 +101,7 @@ jobs:
             exit 1
           fi
 
-          if [[ ! "$MODULE_VERSION" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+          if [[ ! "$MODULE_VERSION" =~ ^v?[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
             echo "ERROR: Invalid module version: ${MODULE_VERSION}"
             exit 1
           fi
