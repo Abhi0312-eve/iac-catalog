@@ -1,3 +1,15 @@
+## 1.2.1 - 2026-10-21
+
+### Changes
+
+- fix: accept v-prefixed module versions and reduce SSM wait timeout
+
+## 1.2.0 - 2026-10-19
+
+### Changes
+
+- feat: add initial EC2 service configuration through SSM
+
 ## 1.1.0 - 2026-09-04
 
 ### Changes
