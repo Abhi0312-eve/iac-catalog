@@ -188,16 +188,31 @@ while IFS= read -r package_file; do
   esac
 done <<< "$PACKAGE_FILES"
 
-if (( ${#UNIT_CANDIDATES[@]} == 0 )); then
-  fail "Package ${PACKAGE_NAME} owns no discoverable systemd service unit."
+STANDALONE_UNITS=()
+TEMPLATE_UNITS=()
+
+for candidate in "${!UNIT_CANDIDATES[@]}"; do
+  if [[ "$candidate" == *@*.service ]]; then
+    TEMPLATE_UNITS+=("$candidate")
+  else
+    STANDALONE_UNITS+=("$candidate")
+  fi
+done
+
+if (( ${#STANDALONE_UNITS[@]} == 0 )); then
+  if (( ${#TEMPLATE_UNITS[@]} > 0 )); then
+    templates="$(printf '%s\\n' "${TEMPLATE_UNITS[@]}" | sort | paste -sd ', ' -)"
+    fail "Package ${PACKAGE_NAME} provides only templated systemd units (${templates}); an instance name is required."
+  fi
+  fail "Package ${PACKAGE_NAME} owns no discoverable standalone systemd service unit."
 fi
 
-if (( ${#UNIT_CANDIDATES[@]} != 1 )); then
-  candidates="$(printf '%s\n' "${!UNIT_CANDIDATES[@]}" | sort | paste -sd ', ' -)"
-  fail "Package ${PACKAGE_NAME} has ambiguous service units: ${candidates}."
+if (( ${#STANDALONE_UNITS[@]} != 1 )); then
+  candidates="$(printf '%s\\n' "${STANDALONE_UNITS[@]}" | sort | paste -sd ', ' -)"
+  fail "Package ${PACKAGE_NAME} has multiple standalone service units: ${candidates}."
 fi
 
-UNIT="${!UNIT_CANDIDATES[@]}"
+UNIT="${STANDALONE_UNITS[0]}"
 
 log "Discovered package-owned systemd unit: ${UNIT}"
 
