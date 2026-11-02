@@ -35,6 +35,7 @@ spec:
         - owner
         - configurationVersion
         - service
+        - serviceVersion
         - port
 
       properties:
@@ -86,6 +87,12 @@ spec:
           description: Service to install and configure on the new EC2 instance
           ui:field: ServicePicker
 
+        serviceVersion:
+          title: Service Version
+          type: string
+          description: Exact package version to install
+          ui:field: ServiceVersionPicker
+
         port:
           title: Desired Listening Port
           type: integer
@@ -111,6 +118,7 @@ spec:
           owner: ${{ parameters.owner }}
           configurationVersion: ${{ parameters.configurationVersion }}
           service: ${{ parameters.service }}
+          serviceVersion: ${{ parameters.serviceVersion }}
           port: ${{ parameters.port }}
 
 
