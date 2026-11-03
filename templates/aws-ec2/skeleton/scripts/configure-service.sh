@@ -1,4 +1,3 @@
-{% raw %}
 #!/usr/bin/env bash
 set -Eeuo pipefail
 
@@ -200,15 +199,15 @@ for candidate in "${!UNIT_CANDIDATES[@]}"; do
   fi
 done
 
-if (( ${#STANDALONE_UNITS[@]} == 0 )); then
-  if (( ${#TEMPLATE_UNITS[@]} > 0 )); then
+if [[ -z "${STANDALONE_UNITS[*]}" ]]; then
+  if [[ -n "${TEMPLATE_UNITS[*]}" ]]; then
     templates="$(printf '%s\\n' "${TEMPLATE_UNITS[@]}" | sort | paste -sd ', ' -)"
     fail "Package ${PACKAGE_NAME} provides only templated systemd units (${templates}); an instance name is required."
   fi
   fail "Package ${PACKAGE_NAME} owns no discoverable standalone systemd service unit."
 fi
 
-if (( ${#STANDALONE_UNITS[@]} != 1 )); then
+if [[ -n "${STANDALONE_UNITS[1]:-}" ]]; then
   candidates="$(printf '%s\\n' "${STANDALONE_UNITS[@]}" | sort | paste -sd ', ' -)"
   fail "Package ${PACKAGE_NAME} has multiple standalone service units: ${candidates}."
 fi
@@ -234,4 +233,3 @@ systemctl is-enabled --quiet "$UNIT" ||
 log "Verified package: ${PACKAGE_NAME} ${PACKAGE_VERSION}"
 log "Verified service: ${UNIT} is enabled and active."
 log "Initial installation completed."
-{% endraw %}
