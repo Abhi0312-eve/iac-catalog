@@ -1,3 +1,4 @@
+{% raw %}
 #!/usr/bin/env bash
 set -Eeuo pipefail
 
@@ -233,3 +234,4 @@ systemctl is-enabled --quiet "$UNIT" ||
 log "Verified package: ${PACKAGE_NAME} ${PACKAGE_VERSION}"
 log "Verified service: ${UNIT} is enabled and active."
 log "Initial installation completed."
+{% endraw %}
