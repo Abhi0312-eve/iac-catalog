@@ -1,3 +1,9 @@
+## 1.2.2 - 2026-11-05
+
+### Changes
+
+- fix: select primary service unit generically
+
 ## 1.2.1 - 2026-10-21
 
 ### Changes
