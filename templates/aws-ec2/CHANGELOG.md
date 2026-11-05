@@ -1,3 +1,9 @@
+## 1.2.4 - 2026-11-05
+
+### Changes
+
+- fix: preserve Bash array length during Nunjucks rendering
+
 ## 1.2.2 - 2026-11-05
 
 ### Changes
