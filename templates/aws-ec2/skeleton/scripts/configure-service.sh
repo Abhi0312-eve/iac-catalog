@@ -212,6 +212,7 @@ PACKAGE_UNIT="${PACKAGE_NAME}.service"
 
 if [[ -n "${UNIT_CANDIDATES[$PACKAGE_UNIT]:-}" ]]; then
   UNIT="$PACKAGE_UNIT"
+# Preserve Bash array-length syntax from Nunjucks parsing.
 elif [[ {% raw %}${#STANDALONE_UNITS[@]}{% endraw %} -eq 1 ]]; then
   UNIT="${STANDALONE_UNITS[0]}"
 else
