@@ -132,22 +132,35 @@ jobs:
             exit 1
           fi
 
-          SCRIPT_URL="https://raw.githubusercontent.com/Abhi0312-eve/iac-catalog/aws-ec2-${MODULE_VERSION}/templates/aws-ec2/skeleton/scripts/configure-service.sh"
+          SCRIPT_PATH="scripts/configure-service.sh"
+
+          if [[ ! -s "$SCRIPT_PATH" ]]; then
+            echo "ERROR: Rendered installer not found: ${SCRIPT_PATH}"
+            exit 1
+          fi
+
+          # Transfer the Backstage-rendered installer through SSM.
+          SCRIPT_B64="$(gzip -9c "$SCRIPT_PATH" | base64 -w0)"
 
           echo "Service: ${SERVICE}"
           echo "Package: ${PACKAGE_NAME}"
           echo "Exact package version: ${PACKAGE_VERSION}"
           echo "Configuration version: ${CONFIGURATION_VERSION}"
 
-          # Pass service, configuration version, package name and exact
-          # package version to the installer.
           printf -v REMOTE_COMMAND \
-            'set -eu\ncurl -fsSL %q -o /tmp/backstage-configure-service.sh\nchmod 0755 /tmp/backstage-configure-service.sh\n/usr/bin/env bash /tmp/backstage-configure-service.sh %q %q %q %q' \
-            "$SCRIPT_URL" \
+            'set -eu\nprintf %%s %q | base64 -d | gzip -d > /tmp/backstage-configure-service.sh\nchmod 0755 /tmp/backstage-configure-service.sh\n/usr/bin/env bash /tmp/backstage-configure-service.sh %q %q %q %q' \
+            "$SCRIPT_B64" \
             "$SERVICE" \
             "$CONFIGURATION_VERSION" \
             "$PACKAGE_NAME" \
             "$PACKAGE_VERSION"
+
+          if (( ${#REMOTE_COMMAND} > 7000 )); then
+            echo "ERROR: Compressed installer exceeds the safe SSM command size."
+            exit 1
+          fi
+
+          echo "Compressed installer transfer size: ${#REMOTE_COMMAND} characters"
 
           COMMANDS_JSON="$(jq -cn --arg command "$REMOTE_COMMAND" \
             '{commands: [$command]}')"
