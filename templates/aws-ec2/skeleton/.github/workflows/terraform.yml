@@ -155,12 +155,12 @@ jobs:
             "$PACKAGE_NAME" \
             "$PACKAGE_VERSION"
 
-          if (( ${#REMOTE_COMMAND} > 7000 )); then
+          if (( {% raw %}${#REMOTE_COMMAND}{% endraw %} > 7000 )); then
             echo "ERROR: Compressed installer exceeds the safe SSM command size."
             exit 1
           fi
 
-          echo "Compressed installer transfer size: ${#REMOTE_COMMAND} characters"
+          echo "Compressed installer transfer size: {% raw %}${#REMOTE_COMMAND}{% endraw %} characters"
 
           COMMANDS_JSON="$(jq -cn --arg command "$REMOTE_COMMAND" \
             '{commands: [$command]}')"
