@@ -212,7 +212,7 @@ PACKAGE_UNIT="${PACKAGE_NAME}.service"
 
 if [[ -n "${UNIT_CANDIDATES[$PACKAGE_UNIT]:-}" ]]; then
   UNIT="$PACKAGE_UNIT"
-elif [[ ${#STANDALONE_UNITS[@]} -eq 1 ]]; then
+elif [[ {% raw %}${#STANDALONE_UNITS[@]}{% endraw %} -eq 1 ]]; then
   UNIT="${STANDALONE_UNITS[0]}"
 else
   candidates="$(printf '%s\\n' "${STANDALONE_UNITS[@]}" | sort | paste -sd ', ' -)"
