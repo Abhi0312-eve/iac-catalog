@@ -207,12 +207,17 @@ if [[ -z "${STANDALONE_UNITS[*]}" ]]; then
   fail "Package ${PACKAGE_NAME} owns no discoverable standalone systemd service unit."
 fi
 
-if [[ -n "${STANDALONE_UNITS[1]:-}" ]]; then
-  candidates="$(printf '%s\\n' "${STANDALONE_UNITS[@]}" | sort | paste -sd ', ' -)"
-  fail "Package ${PACKAGE_NAME} has multiple standalone service units: ${candidates}."
-fi
+UNIT=""
+PACKAGE_UNIT="${PACKAGE_NAME}.service"
 
-UNIT="${STANDALONE_UNITS[0]}"
+if [[ -n "${UNIT_CANDIDATES[$PACKAGE_UNIT]:-}" ]]; then
+  UNIT="$PACKAGE_UNIT"
+elif [[ ${#STANDALONE_UNITS[@]} -eq 1 ]]; then
+  UNIT="${STANDALONE_UNITS[0]}"
+else
+  candidates="$(printf '%s\\n' "${STANDALONE_UNITS[@]}" | sort | paste -sd ', ' -)"
+  fail "Could not determine a unique primary service unit for package ${PACKAGE_NAME}. Candidates: ${candidates}."
+fi
 
 log "Discovered package-owned systemd unit: ${UNIT}"
 
